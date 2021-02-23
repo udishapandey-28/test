@@ -29,6 +29,7 @@ else
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c2f97ca9-857e-4a67-ac5d-0c341f8d7b17" message="#[payload]"/>
 	</flow>
 	<flow name="GetAllCustomers" doc:id="bd67036b-fd6e-4fb6-bc47-354d41ed1b99" >
 		<db:select doc:name="Select" doc:id="743eed02-d77d-4504-aa50-e8de8b9c3143" config-ref="Database_Config">
