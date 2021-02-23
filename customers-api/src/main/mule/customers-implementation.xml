@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="GetCustomersbyCustomerNumber" doc:id="f4e31268-c76a-43e3-96b1-117f2e1e4461" >
+		<db:select doc:name="Select" doc:id="c738b809-e1bc-4e9e-8db7-c775a0c6e5ea" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from Customers where customerNumber=:customernumber]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	customernumber:attributes.uriParams.customernumber
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="403b9205-514d-4ff8-8bc8-30d3086ed566" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Arrays
+var arr=[] as Array<Number>
+---
+if (isEmpty(payload.customerNumber))
+arr
+
+ 
+else
+ payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="GetAllCustomers" doc:id="bd67036b-fd6e-4fb6-bc47-354d41ed1b99" >
+		<db:select doc:name="Select" doc:id="743eed02-d77d-4504-aa50-e8de8b9c3143" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from Customers]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="3336022e-4998-4f64-9165-2f7b598e8dba" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="addCustomers" doc:id="0aecf98e-f1fd-47e9-a713-c46a27659ad8" >
+		<db:insert doc:name="Insert" doc:id="beab509c-cf9f-4f90-9c00-4b4bb7ec9928" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into Customers(customerName, contactLastName, contactFirstName, phone, addressLine1, addressLine2, city, state, postalCode, country, salesRepoEmployeeNumber, credLimit,Email)
+values(:customerName, :contactLastName, :contactFirstName,
+ :phone, :addressLine1, :addressLine2, :city, :state,
+  :postalCode, :country, :salesRepoEmployeeNumber, :credLimit, :Email)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	
+	customerName:payload.customerName,
+	 contactLastName:payload.contactLastName, 
+	 contactFirstName:payload.contactFirstName,
+	 phone:payload.phone, 
+	 addressLine1:payload.addressLine1,
+	 addressLine2:payload.addressLine2,
+	  city:payload.city,
+	   state:payload.state,
+	    postalCode:payload.postalCode, 
+	    country:payload.country, 
+	    salesRepoEmployeeNumber:payload.salesRepEmployeeNumber,
+	     credLimit:payload.creditLimit,
+	     Email:payload.Email
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="6135eebb-3110-49e6-99a0-5327e18b2bb3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"Customer details added successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="patchCustomers" doc:id="367dcbb8-89db-4138-bb32-0b3dfbd2ae64" >
+		<flow-ref doc:name="Store_Payload_in_Variables" doc:id="9e24749f-5494-4a32-9ab8-8c11d12ad1f9" name="customers-apiSub_Flow"/>
+		<db:select doc:name="Select" doc:id="8551510b-bf55-46ff-b840-965de3f30d1e" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from Customers where customerNumber=:cn]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	cn:vars.customerNumber
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="d76f9b61-2505-4df1-a2f4-2422cf8438f9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	payload:
+	{	
+		customerName:if(vars.customerName != null)
+	  			vars.customerName
+	  		else
+	  			payload[0].customerName as String {format: ""} ,
+	 	
+	  	contactLastName: if(vars.contactLastName != null)
+	  			vars.contactLastName
+	  		else
+	  			payload[0].contactLastName as String {format: ""},
+	  			
+	  	contactFirstName: if(vars.contactFirstName != null)
+	  			vars.contactFirstName
+	  		else
+	  			payload[0].contactFirstName as String {format: ""} , 
+	  			
+	  	phone:  if(vars.phone != null)
+	  			vars.phone
+	  		else
+	  			payload[0].phone as String {format: ""},
+	  			
+	  	 addressLine1:  if(vars.addressLine1 != null)
+	  			vars.addressLine1
+	  		else
+	  			payload[0].addressLine1 as String {format: ""}, 
+	  			
+	  	 addressLine2:  if(vars.addressLine2 != null)
+	  			vars.addressLine2
+	  		else
+	  			payload[0].addressLine2 as String {format: ""},
+	  			 
+	  	 city:  if(vars.city != null)
+	  			vars.city
+	  		else
+	  			payload[0].city as String {format: ""},
+	  			
+	  	state:  if(vars.state != null)
+	  			vars.state
+	  		else
+	  			payload[0].state as String {format: ""},
+	  			
+	  	postalCode:  if(vars.postalCode != null)
+	  			vars.postalCode
+	  		else
+	  			payload[0].postalCode as String {format: ""},
+	  	
+	  	country:  if(vars.country != null)
+	  			vars.country
+	  		else
+	  			payload[0].country as String {format: ""},
+	  			
+	  	  credLimit:  if(vars.credLimit != null)
+	  			vars.credLimit
+	  		else
+	  			payload[0].credLimit,
+	  	
+	  	salesRepoEmployeeNumber:  if(vars.salesRepoEmployeeNumber != null)
+	  			vars.salesRepoEmployeeNumber
+	  		else
+	  			payload[0].salesRepoEmployeeNumber as Number,
+	  	Email:  if(vars.Email != null)
+	  			vars.Email
+	  		else
+	  			payload[0].Email as String {format: ""}
+	  	   
+	 
+	  }
+	
+
+
+
+}
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:update doc:name="Update" doc:id="ab4e2432-b109-47c5-8283-36ebb3615ad2" config-ref="Database_Config">
+			<db:sql ><![CDATA[update Customers
+set customerNumber=:customerNumber, customerName=:customerName, contactLastName=:contactLastName,
+ contactFirstName=:contactFirstName, phone=:phone, addressLine1=:addressLine1, addressLine2=:addressLine2,
+  city=:city, state=:state, postalCode=:postalCode, country=:country, salesRepoEmployeeNumber=:salesRepoEmployeeNumber,
+   credLimit=:credLimit, Email=:Email
+   where customerNumber=:customerNumber]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	customerNumber:vars.customerNumber,
+	 customerName:payload.payload.customerName, 
+	 contactLastName:payload.payload.contactLastName,
+ contactFirstName:payload.payload.contactFirstName,
+  phone:payload.payload.phone,
+   addressLine1:payload.payload.addressLine1,
+    addressLine2:payload.payload.addressLine2,
+  city:payload.payload.city,
+   state:payload.payload.state,
+    postalCode:payload.payload.postalCode,
+     country:payload.payload.country, 
+     salesRepoEmployeeNumber:payload.payload.salesRepoEmployeeNumber,
+   credLimit:payload.payload.credLimit,
+   Email:payload.payload.Email
+}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="278cc3b5-18cc-454b-a0d8-4b5d7792aa4c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Customer details updated successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="customers-apiSub_Flow" doc:id="df059e96-d600-4f6e-b738-cc54f5a3728f" >
+		<set-variable value="#[attributes.uriParams.customernumber]" doc:name="customerNumber" doc:id="8933ba8c-05d7-49a7-92ee-64a5d1cb40c7" variableName="customerNumber"/>
+		<set-variable value="#[payload.customerName]" doc:name="customerName" doc:id="8ae0a86a-03ae-414f-80c8-3582ebda739a" variableName="customerName"/>
+		<set-variable value="#[payload.contactLastName]" doc:name="contactLastName" doc:id="d9548738-f0e9-466b-addb-fc4a72b74870" variableName="contactLastName"/>
+		<set-variable value="#[payload.contactFirstName]" doc:name="contactFirstName" doc:id="107ece28-d085-48b3-b067-061a4741b65b" variableName="contactFirstName"/>
+		<set-variable value="#[payload.phone]" doc:name="phone" doc:id="ff493371-1e6e-46b5-a916-06bbe3b14d1f" variableName="phone"/>
+		<set-variable value="#[payload.addressLine1]" doc:name="addressLine1" doc:id="23311f2b-ff45-4c2c-856d-789314a3acc9" variableName="addressLine1"/>
+		<set-variable value="#[payload.addressLine2]" doc:name="addressLine2" doc:id="047e3238-3b06-4060-afae-eece96399bae" variableName="addressLine2"/>
+		<set-variable value="#[payload.city]" doc:name="city" doc:id="0129ac5d-f50e-4975-a425-74d94678ac59" variableName="city"/>
+		<set-variable value="#[payload.state]" doc:name="state" doc:id="1407b736-edb9-4414-97da-84fab98ba51e" variableName="state"/>
+		<set-variable value="#[payload.postalCode]" doc:name="postalCode" doc:id="4b2268ba-73f9-4f21-b874-234759f6e2c5" variableName="postalCode"/>
+		<set-variable value="#[payload.salesRepEmployeeNumber]" doc:name="salesRepoEmployeeNumber" doc:id="7ddd72a8-a676-4710-8438-e97adbd84817" variableName="salesRepoEmployeeNumber"/>
+		<set-variable value="#[payload.country]" doc:name="country" doc:id="492436ee-2d2e-4421-a05b-62a9ac8de2cc" variableName="country"/>
+		<set-variable value="#[payload.creditLimit]" doc:name="credLimit" doc:id="d2fa034e-1066-42d0-90b8-e21d3765c8f7" variableName="credLimit"/>
+		<set-variable value="#[payload.Email]" doc:name="Email" doc:id="10743b62-5c1e-4333-a811-e2509ba65ee5" variableName="Email"/>
+	</sub-flow>
+</mule>

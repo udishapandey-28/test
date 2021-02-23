@@ -1,0 +1,8 @@
+http:
+  port: "8081"
+db:
+  host: "35.223.25.190"
+  port: "3306"
+  username: "root"
+  password: "abcd"
+  database: "InfyServices"
