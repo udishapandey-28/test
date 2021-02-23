@@ -8,7 +8,7 @@
 		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
 		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
 	<munit:config name="customers-implementation-test-suite.xml" />
-	<munit:test name="customers-implementation-test-suite-GetCustomersbyCustomerNumberTest" doc:id="1827fb9b-9abf-49ba-a924-b08d7892e64f" description="Test" ignore="true">
+	<munit:test name="customers-implementation-test-suite-GetCustomersbyCustomerNumberTest" doc:id="1827fb9b-9abf-49ba-a924-b08d7892e64f" description="Test">
 		<munit:execution >
 			<munit:set-event doc:name="Set Event" doc:id="bd5b8029-0ed0-4999-abad-deac00cf4bb8" >
 				<munit:attributes value="#[{uriParams: {customernumber: '1'}}]" />
@@ -19,7 +19,7 @@
 			<munit-tools:assert-equals doc:name="Assert equals" doc:id="6a614f3d-43e8-4688-8528-19f396566389" actual="#[payload]" expected='#[[{&#10;        "customerNumber": 1,&#10;        "country": "India",&#10;        "contactFirstName": "Udisha",&#10;        "city": "Lucknow",&#10;        "contactLastName": "Pandey",&#10;        "salesRepoEmployeeNumber": 101,&#10;        "phone": "7991827683",&#10;        "postalCode": "232323",&#10;        "credLimit": 100.0,&#10;        "addressLine2": "Java Road",&#10;        "addressLine1": "C-Block",&#10;        "state": "Uttar Pradesh",&#10;        "customerName": "Udisha Pandey",&#10;        "Email": "udisha2810pandey@gmail.com"&#10;    }]]' message="payload dosen't match"/>
 		</munit:validation>
 	</munit:test>
-	<munit:test name="customers-implementation-test-suite-GetAllCustomersTest" doc:id="67ef655b-022f-4e44-b2ff-35977cc249c8" description="Test" ignore="true">
+	<munit:test name="customers-implementation-test-suite-GetAllCustomersTest" doc:id="67ef655b-022f-4e44-b2ff-35977cc249c8" description="Test">
 		<munit:execution >
 			<flow-ref doc:name="Flow-ref to GetAllCustomers" doc:id="a03292a7-6486-4ac8-a517-dfb3d83251ae" name="GetAllCustomers"/>
 		</munit:execution>
@@ -27,7 +27,7 @@
 			<munit-tools:assert-that doc:name="Assert that" doc:id="9c93c2d0-eb42-4e37-9775-c93afe6e0d60" message="customers data not returned" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
 		</munit:validation>
 	</munit:test>
-	<munit:test name="customers-implementation-test-suite-addCustomersTest" doc:id="7106768d-2da4-4eed-b672-7390f198030e" description="Test" ignore="true">
+	<munit:test name="customers-implementation-test-suite-addCustomersTest" doc:id="7106768d-2da4-4eed-b672-7390f198030e" description="Test">
 		<munit:behavior >
 			<munit:set-event doc:name="Set Event" doc:id="facedc6e-7cbd-49f0-9e33-059be796396a" >
 				<munit:payload value='#[output application/json&#10;---&#10;{&#10;   &#10;        "country": "India",&#10;        "contactFirstName": "ABC",&#10;        "city": "Lucknow",&#10;        "contactLastName": "Pandey",&#10;        "salesRepoEmployeeNumber": 101,&#10;        "phone": "7991827623",&#10;        "postalCode": "232323",&#10;        "credLimit": 100.0,&#10;        "addressLine2": "Java Road",&#10;        "addressLine1": "C-Block",&#10;        "state": "Uttar Pradesh",&#10;        "customerName": "ABC Pandey",&#10;        "Email": "ABCpandey@gmail.com"&#10;}&#10;]' mediaType="application/json" />
@@ -50,7 +50,7 @@
 			<munit-tools:assert-equals doc:name="Assert equals" doc:id="fdf41ecb-85b0-42f0-bab2-0fd46a02d23a" actual="#[payload]" expected='#["message": "Customer details added successfully"]' message="payload dosen't match"/>
 		</munit:validation>
 	</munit:test>
-	<munit:test name="customers-implementation-test-suite-patchCustomersTest" doc:id="7510b819-f162-4ce3-84c6-80427f79de98" description="Test" ignore="true">
+	<munit:test name="customers-implementation-test-suite-patchCustomersTest" doc:id="7510b819-f162-4ce3-84c6-80427f79de98" description="Test">
 		<munit:execution >
 			<flow-ref doc:name="Flow-ref to patchCustomers" doc:id="986b395e-2162-481a-8419-d45fdb678273" name="patchCustomers"/>
 		</munit:execution>
